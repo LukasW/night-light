@@ -1,0 +1,10 @@
+# Color Up
+
+## Status
+* Simple color
+* Loop
+** Random
+** Rainbow
+
+## Links
+* https://www.banggood.com/50PCS-15W-WS2811-Waterproof-Full-Color-RGB-LED-Digital-Pixel-Module-LightDC5V-or-DC12V-p-1222034.html?rmmds=myorder&cur_warehouse=CN&ID=49552[50PCS 15W WS2811 Waterproof Full Color RGB LED Digital Pixel Module Light - 5V Version]
