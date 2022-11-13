@@ -8,8 +8,10 @@
 #include <ArduinoJson.h>
 #include <string>
 #include <sstream>
+#include <time.h>
 
 WebServer server(80);
+void printLocalTime();
 
 enum PixelsStatus
 {
@@ -28,10 +30,18 @@ volatile uint8_t green;
 volatile uint8_t blue;
 volatile int16_t pixel = -1;
 
+const char *ntpServer = "pool.ntp.org";
+
 void webserver(void *parameter)
 {
     sleep(2);
     setupWiFi(WLAN_SSID, WLAN_HOSTNAME, WLAN_PASSWORD);
+
+    configTime(0, 0, ntpServer);
+    setenv("TZ", "CET-1CEST,M3.5.0,M10.5.0/3", 1); // Zurich
+    tzset();
+
+    printLocalTime();
 
     server.on("/color", HTTP_GET, []()
               {
@@ -71,7 +81,7 @@ long lastIsr = millis();
 
 void IRAM_ATTR ISR()
 {
-    if (millis() - lastIsr > 150)
+    if (millis() - lastIsr > 200)
     {
         switch (pixelsStatus)
         {
@@ -102,7 +112,6 @@ void IRAM_ATTR ISR()
 }
 
 const int BUTTON_PIN = 0;
-const int LED_PIN = 5;
 
 void setup()
 {
@@ -110,7 +119,6 @@ void setup()
     Log::LOG.enable();
 
     pinMode(GPIO_NUM_0, INPUT_PULLUP);
-    pinMode(LED_PIN, OUTPUT);
 
     attachInterrupt(GPIO_NUM_0, ISR, RISING);
 
@@ -164,4 +172,15 @@ void loop()
     {
         loopPixels();
     }
+}
+
+void printLocalTime()
+{
+    struct tm timeinfo;
+    if (!getLocalTime(&timeinfo))
+    {
+        Serial.println("Failed to obtain time 1");
+        return;
+    }
+    Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S zone %Z %z ");
 }
